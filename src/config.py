@@ -14,9 +14,18 @@ class DataConfig(BaseModel):
     height: int
 
 
+class LossConfig(BaseModel):
+    """Pydantic model class for storing loss functions parameters"""
+    name: str
+    weight: float
+    loss_fn: str
+    loss_kwargs: dict
+
+
 class Config(BaseModel):
     """Class for storing training parameters"""
     data_config: DataConfig
+    losses: List[LossConfig]
 
     @classmethod
     def from_yaml(cls, path: str) -> 'Config':
