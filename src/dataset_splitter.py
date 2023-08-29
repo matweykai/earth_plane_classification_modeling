@@ -9,7 +9,7 @@ from skmultilearn.model_selection.iterative_stratification import IterativeStrat
 def stratify_shuffle_split_subsets(
     annotation: pd.DataFrame,
     train_fraction: float = 0.8,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Split dataset on train/valid sets and saves it
 
     Args:
@@ -42,14 +42,18 @@ def stratify_shuffle_split_subsets(
     all_x = annotation.index.to_numpy(np.uint8)
     all_y = annotation[y_columns].to_numpy(dtype=np.uint8)
 
-    train_indexes, valid_indexes = _split(all_x, all_y, distribution=[1 - train_fraction, train_fraction])
+    train_indexes, other_indexes = _split(all_x, all_y, distribution=[1 - train_fraction, train_fraction])
 
     train_subset = annotation.iloc[train_indexes]
+    other_subset = annotation.iloc[other_indexes]
+
+    test_indexes, valid_indexes = _split(other_subset.index.to_numpy(np.uint8), other_subset[y_columns].to_numpy(dtype=np.uint8), distribution=[0.5, 0.5])
     valid_subset = annotation.iloc[valid_indexes]
+    test_subset = annotation.iloc[test_indexes]
 
     logging.info("Stratifying dataset is completed.")
 
-    return train_subset, valid_subset
+    return train_subset, valid_subset, test_subset
 
 
 def _split(

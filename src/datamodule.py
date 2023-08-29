@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 
 import pandas as pd
 from pytorch_lightning import LightningDataModule
+from pytorch_lightning.utilities.types import EVAL_DATALOADERS
 from torch.utils.data import DataLoader, Dataset
 
 from src.augmentations import get_transforms
@@ -26,10 +27,12 @@ class PlanetDM(LightningDataModule):
         self._dataset_path = config.dataset_path
         self._train_transforms = get_transforms(width=config.width, height=config.height)
         self._valid_transforms = get_transforms(width=config.width, height=config.height, augmentations=False)
+        self._test_transforms = get_transforms(width=config.width, height=config.height, augmentations=False)
         self._image_folder = os.path.join(config.dataset_path, 'images')
 
         self.train_dataset: Dataset
         self.valid_dataset: Dataset
+        self.test_dataset: Dataset
     
     def prepare_data(self) -> None:
         """Prepares data for training. It will be called once before any worker start
@@ -53,10 +56,18 @@ class PlanetDM(LightningDataModule):
 
             valid_df = read_df(self._dataset_path, 'valid')
 
-            self.train_dataset = PlanetDataset(
+            self.valid_dataset = PlanetDataset(
                 labels_df=valid_df,
                 images_folder=self._image_folder,
                 transforms=self._valid_transforms,
+            )
+        elif stage == 'test':
+            test_df = read_df(self._dataset_path, 'test')
+
+            self.test_dataset = PlanetDataset(
+                labels_df=test_df,
+                images_folder=self._image_folder,
+                transforms=self._test_transforms,
             )
 
     def train_dataloader(self) -> DataLoader:
@@ -90,6 +101,21 @@ class PlanetDM(LightningDataModule):
             drop_last=False,
 
         )
+    
+    def test_dataloader(self) -> DataLoader:
+        """Returns dataloader with validation data
+
+        Returns:
+            DataLoader: loader with validation data
+        """
+        return DataLoader(
+            dataset=self.test_dataset,
+            batch_size=self._batch_size,
+            num_workers=self._n_workers,
+            shuffle=False,
+            pin_memory=True,
+            drop_last=False,
+        )
 
 
 def split_and_save_datasets(data_path: str, train_fraction: float = 0.8):
@@ -107,18 +133,22 @@ def split_and_save_datasets(data_path: str, train_fraction: float = 0.8):
     df = df.drop_duplicates()
     logging.info(f'Without duplicates len: {len(df)}')
 
-    train_df, valid_df = stratify_shuffle_split_subsets(df, train_fraction=train_fraction)
+    train_df, valid_df, test_df = stratify_shuffle_split_subsets(df, train_fraction=train_fraction)
     logging.info(f'Train dataset len: {len(train_df)}')
     logging.info(f'Valid dataset len: {len(valid_df)}')
+    logging.info(f'Valid dataset len: {len(test_df)}')
 
     train_ds_path = os.path.join(data_path, 'df_train.csv')
     valid_ds_path = os.path.join(data_path, 'df_valid.csv')
+    test_ds_path = os.path.join(data_path, 'df_test.csv')
 
     logging.info(f'Train dataset_path: {train_ds_path}')
     logging.info(f'Valid dataset_path: {valid_ds_path}')
+    logging.info(f'Test dataset_path: {test_ds_path}')
 
     train_df.to_csv(train_ds_path, index=False)
     valid_df.to_csv(valid_ds_path, index=False)
+    test_df.to_csv(test_ds_path, index=False)
     logging.info('Datasets successfully saved!')
 
 
@@ -127,7 +157,7 @@ def read_df(data_path: str, mode: str) -> pd.DataFrame:
 
     Args:
         data_path (str): path to the csv file
-        mode (str): string value for getting train or val datasets
+        mode (str): string value for getting train, val or test datasets
 
     Returns:
         pd.DataFrame: dataframe loaded from disk

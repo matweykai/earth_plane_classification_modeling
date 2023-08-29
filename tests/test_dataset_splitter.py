@@ -39,6 +39,6 @@ def test_train_ratio_split(ds_size: int, train_ratio: float, expected_train_size
 
     test_df = pd.DataFrame(np_dataset, columns=['image_name'] + y_columns)
 
-    train_df, _ = stratify_shuffle_split_subsets(test_df, train_ratio)
+    train_df, _, _ = stratify_shuffle_split_subsets(test_df, train_ratio)
 
     assert train_df.shape[0] == expected_train_size

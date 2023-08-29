@@ -1,4 +1,6 @@
+from typing import Any, Optional
 import pytorch_lightning as pl
+from pytorch_lightning.utilities.types import STEP_OUTPUT
 import torch
 from timm import create_model
 
@@ -28,6 +30,7 @@ class PlanetModule(pl.LightningModule):
             threshold=0.5,
         )
         self._valid_metrics = metrics.clone(prefix='val_')
+        self._test_metrics = metrics.clone(prefix='test_')
 
         self.save_hyperparameters()
 
@@ -82,7 +85,7 @@ class PlanetModule(pl.LightningModule):
         return self._calculate_loss(pr_logits, gt_labels, 'train_')
 
     def validation_step(self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
-        """Validation step of the model that includes forward pass and metrics calculation
+        """Validation step of the model that includes forward pass, loss and metrics calculation
 
         Args:
             batch (tuple[torch.Tensor, torch.Tensor]): tuple of images batch and labels batch
@@ -94,6 +97,18 @@ class PlanetModule(pl.LightningModule):
         pr_labels = torch.sigmoid(pr_logits)
         self._valid_metrics(pr_labels, gt_labels)
 
+    def test_step(self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
+        """Test step of the model that includes forward pass and metrics calculation
+
+        Args:
+            batch (tuple[torch.Tensor, torch.Tensor]): tuple of images batch and labels batch
+            batch_idx (int): index of the current batch
+        """
+        images, gt_labels = batch
+        pr_logits = self._model(images)
+        pr_labels = torch.sigmoid(pr_logits)
+        self._test_metrics(pr_labels, gt_labels)
+
     def on_validation_epoch_start(self) -> None:
         """Reset metrics before validation epoch
         """
@@ -103,6 +118,16 @@ class PlanetModule(pl.LightningModule):
         """Log metrics after validation epoch
         """
         self.log_dict(self._valid_metrics.compute(), on_epoch=True)
+
+    def on_test_epoch_start(self) -> None:
+        """Reset metrics before test epoch
+        """
+        self._test_metrics.reset()
+
+    def on_test_epoch_end(self) -> None:
+        """Log metrics after test epoch
+        """
+        self.log_dict(self._test_metrics.compute(), on_epoch=True)
 
     def _calculate_loss(
         self,
