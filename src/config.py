@@ -26,6 +26,15 @@ class Config(BaseModel):
     """Class for storing training parameters"""
     data_config: DataConfig
     losses: List[LossConfig]
+    n_epochs: int
+    num_classes: int
+    monitor_metric: str
+    model_kwargs: dict
+    optimizer: str
+    optimizer_kwargs: dict
+    scheduler: str
+    scheduler_kwargs: dict
+
 
     @classmethod
     def from_yaml(cls, path: str) -> 'Config':
