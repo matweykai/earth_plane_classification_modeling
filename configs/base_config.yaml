@@ -1,0 +1,40 @@
+project_name: 'ForestClassifier'
+experiment_name: 'first_try'
+random_seed: 1234
+
+accelerator: 'cpu'
+device: 0
+
+n_epochs: 20
+num_classes: 17
+
+model_kwargs:
+  model_name: 'resnet18'
+  pretrained: true
+
+optimizer: 'torch.optim.AdamW'
+optimizer_kwargs:
+  lr: 1e-3
+  weight_decay: 1e-5
+
+scheduler: 'torch.optim.lr_scheduler.StepLR'
+scheduler_kwargs:
+  step_size: 10
+  gamma: 0.5
+
+losses:
+  - name: 'bce'
+    weight: 1
+    loss_fn: 'torch.nn.BCEWithLogitsLoss'
+    loss_kwargs: {}
+
+data_config:
+  dataset_path: 'data/datasets/planet/train'
+  batch_size: 10
+  n_workers: 4
+  train_fraq: 0.8
+  width: 256
+  height: 256
+
+monitor_metric: 'val_f1'
+monitor_mode: 'max'

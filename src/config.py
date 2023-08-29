@@ -26,20 +26,27 @@ class Config(BaseModel):
     """Class for storing training parameters"""
     project_name: str
     experiment_name: str
+    random_seed: int
+
     accelerator: str
     device: int
-    data_config: DataConfig
-    losses: List[LossConfig]
+
     n_epochs: int
     num_classes: int
-    monitor_metric: str
-    monitor_mode: str
+
     model_kwargs: dict
+
     optimizer: str
     optimizer_kwargs: dict
+
     scheduler: str
     scheduler_kwargs: dict
-    random_seed: int
+    
+    losses: List[LossConfig]
+    data_config: DataConfig
+
+    monitor_metric: str
+    monitor_mode: str
 
 
     @classmethod
