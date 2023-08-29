@@ -26,11 +26,10 @@ class PlanetDM(LightningDataModule):
         self._dataset_path = config.dataset_path
         self._train_transforms = get_transforms(width=config.width, height=config.height)
         self._valid_transforms = get_transforms(width=config.width, height=config.height, augmentations=False)
-        self._image_folder = os.path.join(config.data_path, 'images')
+        self._image_folder = os.path.join(config.dataset_path, 'images')
 
-        self.train_dataset: Optional[Dataset] = None
-        self.valid_dataset: Optional[Dataset] = None
-        self.test_dataset: Optional[Dataset] = None
+        self.train_dataset: Dataset
+        self.valid_dataset: Dataset
     
     def prepare_data(self) -> None:
         """Prepares data for training. It will be called once before any worker start

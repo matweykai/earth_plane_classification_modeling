@@ -53,10 +53,10 @@ def stratify_shuffle_split_subsets(
 
 
 def _split(
-    xs: np.array,
-    ys: np.array,
+    xs: np.ndarray,
+    ys: np.ndarray,
     distribution: Union[None, List[float]] = None,
-) -> Tuple[np.array, np.array]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """Splits multilabel dataset with sklearn multilearn function
 
     Args:

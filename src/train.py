@@ -46,7 +46,7 @@ def train(config: Config):
 
     # Configure Lightning components
     checkpoint_callback = ModelCheckpoint(
-        experiment_save_path,
+        dirpath=experiment_save_path,
         monitor=config.monitor_metric,
         mode=config.monitor_mode,
         save_top_k=1,
@@ -66,6 +66,7 @@ def train(config: Config):
     )
 
     trainer.fit(model=model, datamodule=datamodule)
+    trainer.validate(ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
     trainer.test(ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
 
 

@@ -120,7 +120,7 @@ class PlanetModule(pl.LightningModule):
         Returns:
             torch.Tensor: calculated loss
         """
-        total_loss = 0
+        total_loss: torch.Tensor = 0
 
         for cur_loss in self._losses:
             loss = cur_loss.loss(pr_logits, gt_labels)
