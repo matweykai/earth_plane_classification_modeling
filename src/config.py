@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Union
 
+import os
 from omegaconf import OmegaConf
 from pydantic import BaseModel
 
@@ -29,7 +30,7 @@ class Config(BaseModel):
     random_seed: int
 
     accelerator: str
-    device: int
+    device: Union[int, list]
 
     n_epochs: int
     num_classes: int
@@ -59,5 +60,21 @@ class Config(BaseModel):
         Returns:
             Config: config object that stores all training settings
         """
-        cfg = OmegaConf.to_container(OmegaConf.load(path), resolve=True)
+        cfg: dict = OmegaConf.to_container(OmegaConf.load(path), resolve=True)
+
+        if 'experiment_name' not in cfg:
+            latest_exp = 0
+
+            for temp_file in os.listdir('experiments'):
+                if 'exp_' in temp_file:
+                    try:
+                        temp_ind = int(temp_file.split('_')[-1])
+                    except ValueError:
+                        continue
+
+                    if temp_ind > latest_exp:
+                        latest_exp = temp_ind
+            
+            cfg['experiment_name'] = f'exp_{latest_exp + 1}'
+
         return cls(**cfg)

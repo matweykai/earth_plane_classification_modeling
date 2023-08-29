@@ -56,8 +56,9 @@ def train(config: Config):
     trainer = pl.Trainer(
         max_epochs=config.n_epochs,
         accelerator=config.accelerator,
-        devices=[config.device],
+        devices=config.device,
         log_every_n_steps=20,
+        deterministic=True,
         callbacks=[
             checkpoint_callback,
             EarlyStopping(monitor=config.monitor_metric, patience=4, mode=config.monitor_mode),

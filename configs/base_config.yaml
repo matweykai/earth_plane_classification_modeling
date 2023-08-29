@@ -1,9 +1,9 @@
 project_name: 'ForestClassifier'
-experiment_name: 'first_try'
+# experiment_name: 'first_try'
 random_seed: 1234
 
-accelerator: 'cpu'
-device: 0
+accelerator: 'auto'
+device: 4
 
 n_epochs: 20
 num_classes: 17
