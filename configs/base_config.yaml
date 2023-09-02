@@ -2,8 +2,8 @@ project_name: 'ForestClassifier'
 # experiment_name: 'first_try'
 random_seed: 1234
 
-accelerator: 'auto'
-device: 4
+accelerator: 'cuda'
+device: 1
 
 n_epochs: 20
 num_classes: 17
@@ -30,8 +30,8 @@ losses:
 
 data_config:
   dataset_path: 'data/datasets/planet/train'
-  batch_size: 10
-  n_workers: 4
+  batch_size: 100
+  n_workers: 8
   train_fraq: 0.8
   width: 256
   height: 256
