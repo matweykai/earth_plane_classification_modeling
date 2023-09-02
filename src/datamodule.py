@@ -1,10 +1,9 @@
 import logging
 import os
-from typing import Optional, Tuple
+from typing import Optional
 
 import pandas as pd
 from pytorch_lightning import LightningDataModule
-from pytorch_lightning.utilities.types import EVAL_DATALOADERS
 from torch.utils.data import DataLoader, Dataset
 
 from src.augmentations import get_transforms
@@ -128,7 +127,7 @@ def split_and_save_datasets(data_path: str, train_fraction: float = 0.8):
     """
     ds_path = os.path.join(data_path, 'labels.csv')
 
-    df = pd.read_csv(ds_path)
+    df = pd.read_csv(ds_path, index_col=0)
     logging.info(f'Original dataset: {ds_path} {len(df)}')
     df = df.drop_duplicates()
     logging.info(f'Without duplicates len: {len(df)}')

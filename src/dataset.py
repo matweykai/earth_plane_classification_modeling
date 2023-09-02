@@ -30,7 +30,7 @@ class PlanetDataset(Dataset):
         self.images_folder = images_folder
         self.transforms = transforms
 
-    def __getitem__(self, idx: int) -> tuple[Tensor, np.array]:
+    def __getitem__(self, idx: int) -> tuple[Tensor, np.ndarray]:
         """Returns image and labels
 
         Args:
@@ -41,8 +41,8 @@ class PlanetDataset(Dataset):
         """
         data_row = self.labels_df.iloc[idx]
 
-        image_path = os.path.join(self.images_folder, data_row['image_name'])
-        labels = np.array(data_row[1:], dtype=np.int8)
+        image_path = os.path.join(self.images_folder, data_row['image_name'] + '.jpg')
+        labels = np.array(data_row[1:], dtype=np.float32)
 
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
