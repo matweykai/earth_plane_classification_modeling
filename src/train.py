@@ -2,9 +2,11 @@ import argparse
 import logging
 import os
 
-import pytorch_lightning as pl
+import lightning as pl
+from lightning.pytorch import loggers
+from lightning.pytorch.callbacks import EarlyStopping, LearningRateMonitor, ModelCheckpoint
+
 from clearml import Task
-from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor, ModelCheckpoint
 
 from src.config import Config
 from src.constants import EXPERIMENTS_PATH
@@ -64,6 +66,7 @@ def train(config: Config):
             EarlyStopping(monitor=config.monitor_metric, patience=4, mode=config.monitor_mode),
             LearningRateMonitor(logging_interval='epoch'),
         ],
+        logger=loggers.TensorBoardLogger(experiment_save_path, log_graph=True),
     )
 
     trainer.fit(model=model, datamodule=datamodule)
