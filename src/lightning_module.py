@@ -1,6 +1,6 @@
 from typing import Any, Optional
-import pytorch_lightning as pl
-from pytorch_lightning.utilities.types import STEP_OUTPUT
+from torchmetrics.classification import MultilabelConfusionMatrix
+import lightning as pl
 import torch
 from timm import create_model
 

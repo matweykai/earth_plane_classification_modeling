@@ -48,8 +48,8 @@ def stratify_shuffle_split_subsets(
     other_subset = annotation.iloc[other_indexes]
 
     test_indexes, valid_indexes = _split(other_subset.index.to_numpy(np.uint8), other_subset[y_columns].to_numpy(dtype=np.uint8), distribution=[0.5, 0.5])
-    valid_subset = annotation.iloc[valid_indexes]
-    test_subset = annotation.iloc[test_indexes]
+    valid_subset = other_subset.iloc[valid_indexes]
+    test_subset = other_subset.iloc[test_indexes]
 
     logging.info("Stratifying dataset is completed.")
 

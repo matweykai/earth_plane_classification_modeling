@@ -3,13 +3,12 @@ import os
 from typing import Optional
 
 import pandas as pd
-from pytorch_lightning import LightningDataModule
+from lightning import LightningDataModule
 from torch.utils.data import DataLoader, Dataset
 
 from src.augmentations import get_transforms
 from src.config import DataConfig
 from src.dataset import PlanetDataset
-from src.dataset_splitter import stratify_shuffle_split_subsets
 
 
 class PlanetDM(LightningDataModule):
@@ -34,9 +33,43 @@ class PlanetDM(LightningDataModule):
         self.test_dataset: Dataset
     
     def prepare_data(self) -> None:
-        """Prepares data for training. It will be called once before any worker start
+        """Checks data existance and log datasets info. 
+        It will be called once before any worker start
         """
-        split_and_save_datasets(self._dataset_path, self._train_fraq)
+        # Check data quality
+        train_ds_path = os.path.join(self._dataset_path, 'df_train.csv')
+        valid_ds_path = os.path.join(self._dataset_path, 'df_valid.csv')
+        test_ds_path = os.path.join(self._dataset_path, 'df_test.csv')
+
+        # Ensure data exists
+        if any(map(lambda x: not os.path.exists(x), [train_ds_path, valid_ds_path, test_ds_path])):
+            raise RuntimeError('Not all dataframe files exist! Run "preprocess_data" first')
+
+        ds_path = os.path.join(self._dataset_path, 'labels.csv')
+        df = pd.read_csv(ds_path, index_col=0)
+        logging.info(f'Original dataset: {ds_path} {len(df)}')
+        df = df.drop_duplicates()
+        logging.info(f'Without duplicates len: {len(df)}')
+
+        train_df = pd.read_csv(train_ds_path)
+        valid_df = pd.read_csv(valid_ds_path)
+        test_df = pd.read_csv(test_ds_path)
+
+        logging.info(f'Train dataset len: {len(train_df)}')
+        logging.info(f'Valid dataset len: {len(valid_df)}')
+        logging.info(f'Valid dataset len: {len(test_df)}')
+
+        logging.info(f'Train dataset sample: {train_df.iloc[:5].image_name.values}')
+        logging.info(f'Valid dataset sample: {valid_df.iloc[:5].image_name.values}')
+        logging.info(f'Test dataset sample: {test_df.iloc[:5].image_name.values}')
+
+        train_df_stat = train_df.drop(columns='image_name').sum(axis=0)
+        valid_df_stat = valid_df.drop(columns='image_name').sum(axis=0)
+        test_df_stat = test_df.drop(columns='image_name').sum(axis=0)
+
+        logging.info(f'Train statistics: \n{(train_df_stat / train_df_stat.sum() * 100).to_string()}')
+        logging.info(f'Valid statistics: \n{(valid_df_stat / valid_df_stat.sum() * 100).to_string()}')
+        logging.info(f'Test statistics: \n{(test_df_stat / test_df_stat.sum() * 100).to_string()}')
 
     def setup(self, stage: Optional[str] = None):
         """Setups each worker environment for training and validation purposes
@@ -98,7 +131,6 @@ class PlanetDM(LightningDataModule):
             shuffle=False,
             pin_memory=True,
             drop_last=False,
-
         )
     
     def test_dataloader(self) -> DataLoader:
@@ -115,40 +147,6 @@ class PlanetDM(LightningDataModule):
             pin_memory=True,
             drop_last=False,
         )
-
-
-def split_and_save_datasets(data_path: str, train_fraction: float = 0.8):
-    """Splits dataset into train and valid subsets and saves them in the same directory.
-    Specified directory should contain 'labels.csv' file
-
-    Args:
-        data_path (str): path to the directory with images folder and labels.csv file
-        train_fraction (float, optional): ratio of training samples in the final dataset. Defaults to 0.8.
-    """
-    ds_path = os.path.join(data_path, 'labels.csv')
-
-    df = pd.read_csv(ds_path, index_col=0)
-    logging.info(f'Original dataset: {ds_path} {len(df)}')
-    df = df.drop_duplicates()
-    logging.info(f'Without duplicates len: {len(df)}')
-
-    train_df, valid_df, test_df = stratify_shuffle_split_subsets(df, train_fraction=train_fraction)
-    logging.info(f'Train dataset len: {len(train_df)}')
-    logging.info(f'Valid dataset len: {len(valid_df)}')
-    logging.info(f'Valid dataset len: {len(test_df)}')
-
-    train_ds_path = os.path.join(data_path, 'df_train.csv')
-    valid_ds_path = os.path.join(data_path, 'df_valid.csv')
-    test_ds_path = os.path.join(data_path, 'df_test.csv')
-
-    logging.info(f'Train dataset_path: {train_ds_path}')
-    logging.info(f'Valid dataset_path: {valid_ds_path}')
-    logging.info(f'Test dataset_path: {test_ds_path}')
-
-    train_df.to_csv(train_ds_path, index=False)
-    valid_df.to_csv(valid_ds_path, index=False)
-    test_df.to_csv(test_ds_path, index=False)
-    logging.info('Datasets successfully saved!')
 
 
 def read_df(data_path: str, mode: str) -> pd.DataFrame:
