@@ -1,5 +1,5 @@
 project_name: 'ForestClassifier'
-# experiment_name: 'first_try'
+experiment_name: 'train_exp_v1.0'
 random_seed: 1234
 
 accelerator: 'cuda'
@@ -14,12 +14,12 @@ model_kwargs:
 
 optimizer: 'torch.optim.AdamW'
 optimizer_kwargs:
-  lr: 1e-3
+  lr: 1e-2
   weight_decay: 1e-5
 
 scheduler: 'torch.optim.lr_scheduler.StepLR'
 scheduler_kwargs:
-  step_size: 10
+  step_size: 3
   gamma: 0.5
 
 losses:
@@ -29,7 +29,7 @@ losses:
     loss_kwargs: {}
 
 data_config:
-  dataset_path: 'data/datasets/planet/train'
+  dataset_path: 'data/datasets/planet'
   batch_size: 100
   n_workers: 8
   train_fraq: 0.8
