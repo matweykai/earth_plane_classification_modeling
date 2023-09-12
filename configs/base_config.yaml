@@ -1,5 +1,5 @@
 project_name: 'ForestClassifier'
-experiment_name: 'train_exp_v1.0'
+experiment_name: 'train_exp_v1.1'
 random_seed: 1234
 
 accelerator: 'cuda'
@@ -17,10 +17,9 @@ optimizer_kwargs:
   lr: 1e-2
   weight_decay: 1e-5
 
-scheduler: 'torch.optim.lr_scheduler.StepLR'
+scheduler: 'torch.optim.lr_scheduler.ExponentialLR'
 scheduler_kwargs:
-  step_size: 3
-  gamma: 0.5
+  gamma: 0.85
 
 losses:
   - name: 'bce'
