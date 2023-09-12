@@ -42,7 +42,7 @@ class PlanetDataset(Dataset):
         data_row = self.labels_df.iloc[idx]
 
         image_path = os.path.join(self.images_folder, data_row['image_name'] + '.jpg')
-        labels = np.array(data_row[1:], dtype=np.float32)
+        labels = np.array(data_row[1:], dtype=np.uint8)
 
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

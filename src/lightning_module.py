@@ -23,7 +23,7 @@ class PlanetModule(pl.LightningModule):
         self._model = create_model(num_classes=self._config.num_classes, **self._config.model_kwargs)
         self._losses = get_losses(self._config.losses)
         metrics = get_metrics(
-            num_classes=self._config.num_classes,
+            # num_classes=self._config.num_classes,
             num_labels=self._config.num_classes,
             task='multilabel',
             average='macro',
@@ -148,7 +148,7 @@ class PlanetModule(pl.LightningModule):
         total_loss: torch.Tensor = 0
 
         for cur_loss in self._losses:
-            loss = cur_loss.loss(pr_logits, gt_labels)
+            loss = cur_loss.loss(pr_logits, gt_labels.type(torch.float32))
             total_loss += cur_loss.weight * loss
             self.log(f'{prefix}{cur_loss.name}_loss', loss.item())
         
