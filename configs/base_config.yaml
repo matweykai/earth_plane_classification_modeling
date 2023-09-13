@@ -1,5 +1,5 @@
 project_name: 'ForestClassifier'
-experiment_name: 'train_exp_v1.1'
+experiment_name: 'train_exp_v1.2'
 random_seed: 1234
 
 accelerator: 'cuda'
@@ -9,7 +9,7 @@ n_epochs: 20
 num_classes: 17
 
 model_kwargs:
-  model_name: 'resnet18'
+  model_name: 'resnet50'
   pretrained: true
 
 optimizer: 'torch.optim.AdamW'
@@ -29,7 +29,7 @@ losses:
 
 data_config:
   dataset_path: 'data/datasets/planet'
-  batch_size: 100
+  batch_size: 72
   n_workers: 8
   train_fraq: 0.8
   width: 256

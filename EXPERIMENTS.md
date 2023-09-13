@@ -54,3 +54,29 @@ ClearML:
 * [gamma = 0.85](https://app.clear.ml/projects/039f9b58f33b46a2b9a00150f8320bd9/compare-experiments;ids=85ffd4ac40e94789b41002cad4b23e10,10b36e5579df4f6799e2da992d64cb6e,7d2b949192c44b1f995553b7ce8c9584/scalars/graph) - лучше предыдущих вариантов (по AP) (выбран как самый лучший)
 
 * [gamma = 0.80](https://app.clear.ml/projects/039f9b58f33b46a2b9a00150f8320bd9/compare-experiments;ids=064943fb4d3a4a6ba397a833991e4b71,7d2b949192c44b1f995553b7ce8c9584,10b36e5579df4f6799e2da992d64cb6e/scalars/graph?scalars=graph) - на уровне с бейзлайном
+
+
+## 13.09.2023 Подбор размера модели
+Попробуем использовать более сложные модели для данной задачи
+
+```
+TEST:
+    f1: 0.59 (+0.02)
+    precision: 0.72 (+0.10)
+    recall: 0.55 (+0.0)
+    AP: 0.64 (+0.02)
+
+VAL:
+    bce_loss: 0.2115
+    f1: 0.60 (+0.03)
+    precision: 0.71 (+0.05)
+    recall: 0.56 (+0.03)
+    AP: 0.63 (+0.02)
+```
+
+ClearML:
+- [ResNet152 (gamma = 0.8)](https://app.clear.ml/projects/039f9b58f33b46a2b9a00150f8320bd9/compare-experiments;ids=7d2b949192c44b1f995553b7ce8c9584,dbc13a2b23334e8f8f18ce92b1f6c89a/scalars/graph?scalars=graph) - AP остался примерно таким же, но время обучения увеличилось очень сильно (было 28 мин, а стало ~3 часа)
+
+- [ResNet50 (gamma = 0.8)](https://app.clear.ml/projects/039f9b58f33b46a2b9a00150f8320bd9/compare-experiments;ids=1b192b456db34dbaab912f29321d6d16,7d2b949192c44b1f995553b7ce8c9584/scalars/graph?scalars=graph) - случайно указал не ту gamma, но AP вырос, f1 тоже, а hamming уменьшился
+
+- [ResNet50 (gamma = 0.85)](https://app.clear.ml/projects/039f9b58f33b46a2b9a00150f8320bd9/experiments/a35b3b74adf74fdf89ae02b3a82c9531/output/metrics/scalar) - выбираем resnet50, тк она обладает хорошим качеством и быстро обучается
