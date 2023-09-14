@@ -80,3 +80,30 @@ ClearML:
 - [ResNet50 (gamma = 0.8)](https://app.clear.ml/projects/039f9b58f33b46a2b9a00150f8320bd9/compare-experiments;ids=1b192b456db34dbaab912f29321d6d16,7d2b949192c44b1f995553b7ce8c9584/scalars/graph?scalars=graph) - случайно указал не ту gamma, но AP вырос, f1 тоже, а hamming уменьшился
 
 - [ResNet50 (gamma = 0.85)](https://app.clear.ml/projects/039f9b58f33b46a2b9a00150f8320bd9/experiments/a35b3b74adf74fdf89ae02b3a82c9531/output/metrics/scalar) - выбираем resnet50, тк она обладает хорошим качеством и быстро обучается
+
+
+## 13.09.2023 Focal loss + BCE loss
+Используем взвешивание loss'a на основе вероятностных меток
+
+[Результаты](https://app.clear.ml/projects/039f9b58f33b46a2b9a00150f8320bd9/experiments/98cad6755087468d8cdb75ed65c503d6/execution?columns=selected&columns=type&columns=name&columns=tags&columns=status&columns=project.name&columns=users&columns=started&columns=last_update&columns=last_iteration&columns=parent.name&order=-last_update&filter=) - **Данный эксперимент дал очень плохие результаты** 
+
+## 14.09.2023 Weighted BCE
+Взвешивание классов производилось по их априорному распределению
+
+```
+TEST:
+    f1: 0.53 (-0.04)
+    precision: 0.63 (+0.01)
+    recall: 0.47 (-0.08)
+    AP: 0.62 (-)
+
+VAL:
+    weighted_bce_loss: 0.0015
+    f1: 0.52 (-0.05)
+    precision: 0.65 (-0.01)
+    recall: 0.47 (-0.06)
+    AP: 0.59 (-0.02)
+```
+
+Как видно по метрикам данный подход нам не очень помог
+[Результаты](https://app.clear.ml/projects/039f9b58f33b46a2b9a00150f8320bd9/compare-experiments;ids=4746c43b1dca4d82829cf0b2d08402e5,a35b3b74adf74fdf89ae02b3a82c9531/scalars/graph?scalars=graph)

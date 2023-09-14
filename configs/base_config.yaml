@@ -1,5 +1,5 @@
 project_name: 'ForestClassifier'
-experiment_name: 'train_exp_v1.2'
+experiment_name: 'train_exp_v1.3'
 random_seed: 1234
 
 accelerator: 'cuda'
@@ -35,5 +35,5 @@ data_config:
   width: 256
   height: 256
 
-monitor_metric: 'val_f1'
+monitor_metric: 'val_AP'
 monitor_mode: 'max'
