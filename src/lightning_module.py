@@ -1,4 +1,3 @@
-from typing import Any, Optional
 from torchmetrics.classification import MultilabelConfusionMatrix
 import lightning as pl
 import torch
